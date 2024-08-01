@@ -2,8 +2,7 @@ import type { Object3D } from 'three';
 
 interface QuerySegment {
      type: string | null;
-     name: string | null;
-     uuid: string | null;
+     attributes: Record<string, string>;
      isDirectChild: boolean;
 }
 
@@ -83,13 +82,27 @@ export class QuerySelector {
 
      private parseSegment(segment: string, isDirectChild: boolean): QuerySegment {
           const typeMatch = segment.match(/^(\w+)(?:\[|$)/);
-          const nameMatch = segment.match(/\[name=['"](.+)['"]\]/);
-          const uuidMatch = segment.match(/\[uuid=['"](.+)['"]\]/);
+
+          // Regular expression to match attributes in the format [<property>='value'|"<value>"]
+          const attributesMatch = segment.match(/\[([^\]]+?)=['"]([^'"]*)['"]\]/g);
+
+          // Initialize attributes object
+          const attributes: Record<string, string> = {};
+
+          if (attributesMatch) {
+               // Iterate over each attribute match
+               for (const attr of attributesMatch) {
+                    // Extract property and value using a capturing group
+                    const [, property, value] = attr.match(/\[([^\]]+?)=['"]([^'"]*)['"]\]/) || [];
+                    if (property && value) {
+                         attributes[property] = value;
+                    }
+               }
+          }
 
           return {
                type: typeMatch ? typeMatch[1] : null,
-               name: nameMatch ? nameMatch[1] : null,
-               uuid: uuidMatch ? uuidMatch[1] : null,
+               attributes,
                isDirectChild,
           };
      }
@@ -161,14 +174,23 @@ export class QuerySelector {
      }
 
      private objectMatchesSegment(obj: Object3D, segment: QuerySegment): boolean {
+
           if (segment.type && obj.type !== segment.type) {
+
                return false;
+
           }
-          if (segment.name && obj.name !== segment.name) {
+
+          if ("name" in segment.attributes && obj.name !== segment.attributes.name) {
+
                return false;
+
           }
-          if (segment.uuid && obj.uuid !== segment.uuid) {
+
+          if ("uuid" in segment.attributes && obj.uuid !== segment.attributes.uuid) {
+
                return false;
+
           }
 
           return true;
