@@ -1,17 +1,48 @@
 {
   "name": "three-query-selector",
-  "private": true,
-  "version": "0.0.0",
+  "description": "A powerful and flexible library for querying and selecting objects in Three.js scenes. It provides an intuitive, CSS-like selector syntax to easily find and manipulate 3D objects in your Three.js projects.",
+  "private": false,
+  "version": "1.0.0",
   "type": "module",
+  "author": "Hoodgail Benjamin <hoodgail@proton.me> (https://github.com/Hoodgail)",
   "scripts": {
     "build": "tsc && vite build",
     "test": "bun test"
   },
+  "emitDeclarationOnly": true,
+  "declaration": true,
+  "main": "./dist/main.umd.js",
+  "module": "./dist/main.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/main.es.js",
+      "require": "./dist/main.umd.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hoodgail/three-query-selector.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Hoodgail/three-query-selector/issues"
+  },
+  "homepage": "https://github.com/Hoodgail/three-query-selector",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://www.opensource.org/licenses/mit-license.php"
+    }
+  ],
   "devDependencies": {
     "@types/bun": "^1.1.6",
     "@types/three": "^0.167.1",
     "three": "^0.167.1",
     "typescript": "^5.2.2",
-    "vite": "^5.3.4"
+    "vite": "^5.3.4",
+    "vite-plugin-dts": "^4.0.0-beta.2"
   }
 }

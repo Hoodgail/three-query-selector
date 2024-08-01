@@ -79,7 +79,7 @@ describe('QuerySelector', () => {
 
      test('should clear cache', () => {
           engine.get("Group");
-          engine.clearCache();
+          engine.free();
 
           const spy = spyOn(engine as any, 'executeQuery');
           engine.get("Group");
