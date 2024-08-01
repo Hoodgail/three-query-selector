@@ -2,7 +2,7 @@
   "name": "three-query-selector",
   "description": "A powerful and flexible library for querying and selecting objects in Three.js scenes. It provides an intuitive, CSS-like selector syntax to easily find and manipulate 3D objects in your Three.js projects.",
   "private": false,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "author": "Hoodgail Benjamin <hoodgail@proton.me> (https://github.com/Hoodgail)",
   "scripts": {
