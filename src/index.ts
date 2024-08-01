@@ -1,5 +1,7 @@
 import type { Object3D } from 'three';
 
+export type QueryFilterFunction = (object: Object3D, value: string) => boolean;
+
 interface QuerySegment {
      type: string | null;
      attributes: Record<string, string>;
@@ -12,13 +14,75 @@ export interface QuerySelectorOptions {
 
 const EMPTY_ARRAY: Object3D[] = [];
 
+class QueryFilter {
+
+     private readonly attributes: Map<string, Set<QueryFilterFunction>> = new Map();
+
+     public add(attribute: string, filter: QueryFilterFunction): void {
+
+          if (!this.attributes.has(attribute)) {
+
+               this.attributes.set(attribute, new Set());
+          }
+
+          this.attributes.get(attribute)?.add(filter);
+     }
+
+     public remove(attribute: string, filter: QueryFilterFunction): void {
+
+          if (!this.attributes.has(attribute)) {
+
+               return;
+          }
+
+          this.attributes.get(attribute)?.delete(filter);
+     }
+
+     public has(attribute: string, filter: QueryFilterFunction): boolean {
+
+          if (!this.attributes.has(attribute)) {
+
+               return false;
+          }
+
+          return this.attributes.get(attribute)?.has(filter) || false;
+     }
+
+     public includes(attribute: string,): boolean {
+
+          return this.attributes.has(attribute);
+     }
+
+     public get(attribute: string): Set<QueryFilterFunction> | undefined {
+
+          return this.attributes.get(attribute);
+     }
+
+     public getAll(): Set<QueryFilterFunction>[] {
+
+          return Array.from(this.attributes.values());
+     }
+
+     public clear(): void {
+
+          this.attributes.clear();
+     }
+
+}
+
 export class QuerySelector {
+
+     public readonly filters: QueryFilter = new QueryFilter();
 
      constructor(
           private objects: Object3D[],
           private options: QuerySelectorOptions = { cache: true },
           private cache: Map<string, Object3D[]> | undefined = options.cache ? new Map() : void 0
-     ) { }
+     ) {
+
+          this.filters.add('name', (object, value) => object.name === value);
+          this.filters.add('uuid', (object, value) => object.uuid === value);
+     }
 
      public get(query: string): Object3D[] {
 
@@ -81,6 +145,7 @@ export class QuerySelector {
      }
 
      private parseSegment(segment: string, isDirectChild: boolean): QuerySegment {
+
           const typeMatch = segment.match(/^(\w+)(?:\[|$)/);
 
           // Regular expression to match attributes in the format [<property>='value'|"<value>"]
@@ -90,11 +155,15 @@ export class QuerySelector {
           const attributes: Record<string, string> = {};
 
           if (attributesMatch) {
+
                // Iterate over each attribute match
                for (const attr of attributesMatch) {
+
                     // Extract property and value using a capturing group
                     const [, property, value] = attr.match(/\[([^\]]+?)=['"]([^'"]*)['"]\]/) || [];
+
                     if (property && value) {
+
                          attributes[property] = value;
                     }
                }
@@ -181,15 +250,23 @@ export class QuerySelector {
 
           }
 
-          if ("name" in segment.attributes && obj.name !== segment.attributes.name) {
+          for (let attribute in segment.attributes) {
 
-               return false;
+               let value = segment.attributes[attribute];
 
-          }
+               if (this.filters.includes(attribute)) {
 
-          if ("uuid" in segment.attributes && obj.uuid !== segment.attributes.uuid) {
+                    const filters = this.filters.get(attribute) as Set<QueryFilterFunction>;
 
-               return false;
+                    for (let filter of filters) {
+
+                         if (filter(obj, value) == false) {
+
+                              return false;
+                         }
+                    }
+
+               }
 
           }
 
