@@ -37,6 +37,25 @@
       "url": "https://www.opensource.org/licenses/mit-license.php"
     }
   ],
+  "keywords": [
+    "three",
+    "threejs",
+    "query",
+    "selector",
+    "css",
+    "selector",
+    "query",
+    "find",
+    "select",
+    "manipulate",
+    "object",
+    "scene",
+    "3d",
+    "three.js",
+    "typescript",
+    "javascript",
+    "bun"
+  ],
   "devDependencies": {
     "@types/bun": "^1.1.6",
     "@types/three": "^0.167.1",
